@@ -1,3 +1,3 @@
 # Usando goroutines
 
-Dois métodos para utilizar uma número limitado de goroutines.
+Dois métodos para utilizar um número limitado de goroutines.
