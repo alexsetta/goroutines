@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sync"
+	"sync/atomic"
 	"time"
 )
 
@@ -23,6 +24,7 @@ func work(id int, query string) string {
 
 func normal() {
 	start := time.Now()
+	inExecution := int32(0)
 
 	var results []string
 	var wg sync.WaitGroup
@@ -32,9 +34,11 @@ func normal() {
 		go func(i int) {
 			defer wg.Done()
 			ticket <- struct{}{}
-			s := work(i, fmt.Sprintf("string%d - goroutines: %d", i, len(ticket)))
+			atomic.AddInt32(&inExecution, 1)
+			s := work(i, fmt.Sprintf("string%d - goroutines: %d", i, inExecution))
 			results = append(results, s)
 			<-ticket
+			atomic.AddInt32(&inExecution, -1)
 		}(i)
 	}
 	wg.Wait()
